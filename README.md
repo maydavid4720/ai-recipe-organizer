@@ -33,20 +33,26 @@ This project uses Generative AI to automatically extract structured recipe infor
 
 The project follows a simple client-server architecture.
 
-### Frontend:
+### Frontend
+
 - React
 - Vite
 - Fetch API
 
-### Backend:
+### Backend
+
 - FastAPI
 - SQLAlchemy
 - SQLite
 
-### AI:
+### AI
+
 - Google Gemini 2.5 Flash
 
-The frontend communicates with the FastAPI backend, which handles recipe extraction, AI processing, validation, and data persistence.
+**Request flow:**
+
+The frontend communicates with the FastAPI backend, which validates the user input, extracts recipe content (when a URL is provided), sends a structured prompt to Gemini, validates the AI response, and stores the recipe in the database.
+
 ---
 
 ## Project Structure
@@ -203,6 +209,7 @@ The backend gracefully handles:
 - Request validation errors
 
 The frontend displays user-friendly error messages for each scenario.
+
 ---
 ## Weekly Dinner Suggestions
 
