@@ -1,6 +1,6 @@
 # AI Recipe Organizer
 
-AI Recipe Organizer is a full-stack web application that helps users organize recipes from different sources into a structured and searchable recipe library.
+AI Recipe Organizer is a full-stack web application that uses Generative AI to extract structured recipes from recipe URLs or free-text input and organize them into a searchable personal recipe library.
 
 People often save recipes from websites, blogs, social media posts, and personal notes, but each source presents information in a different format. This makes recipes difficult to organize, search, and reuse.
 
@@ -10,47 +10,43 @@ This project uses Generative AI to automatically extract structured recipe infor
 
 ## Features
 
-* Add recipes from recipe URLs
-* Add recipes from free-text content
-* Extract structured recipe information using Google Gemini
-* Automatically identify:
-
-  * Recipe title
-  * Ingredients
-  * Preparation steps
-  * Category
-  * Preparation time
-  * Tags
-* Store recipes in a local SQLite database
-* Browse all saved recipes
-* Filter recipes by category
-* Delete recipes
-* Weekly dinner suggestion endpoint based on saved Dinner recipes
-* Single-user MVP without authentication
+- Add recipes by pasting recipe text or a recipe URL
+- AI-powered recipe extraction using Google Gemini 2.5 Flash
+- Automatic extraction of:
+  - Title
+  - Category
+  - Preparation time
+  - Ingredients
+  - Preparation steps
+  - Tags
+- Recipe validation before saving
+- Recipe library with category filtering
+- Interactive ingredient checklist
+- RTL/LTR support for Hebrew and English recipes
+- Delete recipes
+- Store original recipe source URL (when available)
+- Weekly dinner suggestions endpoint for automation workflows
 
 ---
 
-## Tech Stack
+## Architecture
 
-### Frontend
+The project follows a simple client-server architecture.
 
-* React
-* Vite
-* JavaScript
-* CSS
+### Frontend:
+- React
+- Vite
+- Fetch API
 
-### Backend
+### Backend:
+- FastAPI
+- SQLAlchemy
+- SQLite
 
-* Python
-* FastAPI
-* SQLAlchemy
-* SQLite
-* Pydantic
-* Google Gemini API
-* Requests
-* BeautifulSoup4
-* Python Dotenv
+### AI:
+- Google Gemini 2.5 Flash
 
+The frontend communicates with the FastAPI backend, which handles recipe extraction, AI processing, validation, and data persistence.
 ---
 
 ## Project Structure
@@ -153,6 +149,35 @@ VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
 
 ---
+## AI Processing Pipeline
+
+The following pipeline summarizes the end-to-end recipe processing flow:
+
+```text
+User Input
+      │
+      ▼
+Validate input
+      │
+      ▼
+Extract webpage content (if URL)
+      │
+      ▼
+Generate structured prompt
+      │
+      ▼
+Google Gemini
+      │
+      ▼
+Validate AI response
+      │
+      ▼
+Save recipe to database
+      │
+      ▼
+Display in UI
+```
+---
 
 ## API Endpoints
 
@@ -166,14 +191,28 @@ VITE_API_BASE_URL=http://127.0.0.1:8000
 | GET    | `/recipes/weekly-dinner`       | Get weekly dinner suggestions    |
 
 ---
+## Error Handling
 
+The backend gracefully handles:
+
+- Empty input
+- Invalid recipe content
+- AI service failures
+- Empty AI responses
+- Invalid JSON responses from the AI model
+- Request validation errors
+
+The frontend displays user-friendly error messages for each scenario.
+---
 ## Weekly Dinner Suggestions
 
-The application includes a meal-planning endpoint that returns the latest recipes stored under the Dinner category.
+The following pipeline summarizes the end-to-end recipe processing flow:
 
-This endpoint can be integrated with automation tools such as n8n to generate weekly shopping-oriented emails containing recipe ingredients and meal ideas.
+The endpoint returns up to 3 recently added recipes from the Dinner category.
 
-The current implementation is designed for local use while the backend server is running.
+It can be integrated with automation tools such as n8n to generate weekly emails containing recipe suggestions and ingredient lists.
+
+The current implementation provides backend support only and does not yet include a dedicated frontend interface.
 
 ---
 
@@ -188,7 +227,6 @@ The current implementation is designed for local use while the backend server is
 
 ## Future Improvements
 
-* Improved UI/UX design
 * Responsive mobile support
 * User authentication and personal accounts
 * Recipe editing functionality
@@ -202,12 +240,12 @@ The current implementation is designed for local use while the backend server is
 
 ## Status
 
-Current version is a functional MVP built to demonstrate:
+This project is currently a functional MVP demonstrating:
 
-* Full-stack development
-* REST API design
-* AI integration
-* Data extraction and processing
-* Database management
-* Frontend-backend communication
-* Environment variable management
+- Full-stack application development
+- REST API design
+- Generative AI integration
+- Structured data extraction
+- Database persistence
+- Frontend–backend communication
+- Robust error handling

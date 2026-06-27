@@ -1,25 +1,30 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import { getRecipes, getRecipesByCategory, createRecipe, deleteRecipe } from './api';
-import RecipeForm from './components/RecipeForm';
-import CategoryFilter from './components/CategoryFilter';
-import RecipeCard from './components/RecipeCard';
+import { useEffect, useState } from "react";
+import "./App.css";
+import {
+  getRecipes,
+  getRecipesByCategory,
+  createRecipe,
+  deleteRecipe,
+} from "./api";
+import RecipeForm from "./components/RecipeForm";
+import CategoryFilter from "./components/CategoryFilter";
+import RecipeCard from "./components/RecipeCard";
 
-const CATEGORIES = ['All', 'Dinner', 'Breakfast', 'Dessert', 'Snack'];
+const CATEGORIES = ["All", "Breakfast", "Lunch", "Dinner", "Dessert", "Salad", "Snack",];
 
 function App() {
   const [recipes, setRecipes] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [error, setError] = useState('');
-  const [userInput, setUserInput] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [error, setError] = useState("");
+  const [userInput, setUserInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function loadRecipes(category = selectedCategory) {
     try {
-      setError('');
+      setError("");
 
       const data =
-        category === 'All'
+        category === "All"
           ? await getRecipes()
           : await getRecipesByCategory(category);
 
@@ -29,37 +34,37 @@ function App() {
       setError(err.message);
     }
   }
-  
+
   async function handleAddRecipe() {
     if (!userInput.trim()) {
-      setError('Please paste a recipe link or recipe text.');
+      setError("Please paste a recipe link or recipe text.");
       return;
     }
 
     try {
       setLoading(true);
-      setError('');
+      setError("");
 
       const newRecipe = await createRecipe(userInput);
 
       setRecipes((currentRecipes) => [newRecipe, ...currentRecipes]);
-      setUserInput('');
-      setSelectedCategory('All');
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+      setUserInput("");
+      setSelectedCategory("All");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleDeleteRecipe(recipeId) {
     try {
-      setError('');
+      setError("");
 
       await deleteRecipe(recipeId);
 
       setRecipes((currentRecipes) =>
-        currentRecipes.filter((recipe) => recipe.id !== recipeId)
+        currentRecipes.filter((recipe) => recipe.id !== recipeId),
       );
     } catch (err) {
       setError(err.message);
@@ -67,7 +72,7 @@ function App() {
   }
 
   useEffect(() => {
-    loadRecipes('All');
+    loadRecipes("All");
   }, []);
 
   return (
@@ -76,7 +81,8 @@ function App() {
         <p className="eyebrow">AI Recipe Archive</p>
         <h1>Organize every recipe you save.</h1>
         <p className="hero-subtitle">
-          Paste a recipe link or text and let AI turn it into a clean, searchable recipe card.
+          Paste a recipe link or text and let AI turn it into a clean,
+          searchable recipe card.
         </p>
       </header>
       <RecipeForm
@@ -85,7 +91,7 @@ function App() {
         loading={loading}
         onAddRecipe={handleAddRecipe}
       />
-      
+
       <CategoryFilter
         categories={CATEGORIES}
         selectedCategory={selectedCategory}
@@ -112,7 +118,8 @@ function App() {
             <p className="empty-icon">✦</p>
             <h3>No recipes found</h3>
             <p>
-              Add a recipe link or text above and let AI organize it into a clean recipe card.
+              Add a recipe link or text above and let AI organize it into a
+              clean recipe card.
             </p>
           </div>
         ) : (

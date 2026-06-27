@@ -3,7 +3,6 @@ import json
 from dotenv import load_dotenv
 from google import genai
 
-
 load_dotenv()
 
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
@@ -65,42 +64,65 @@ If the input is invalid, return:
 }
 """
 
-def extract_recipe_with_ai(recipe_text: str) -> dict:
-    """
-    Sends recipe-related text to Gemini and returns structured recipe data.    
-    """
-    if not recipe_text or not recipe_text.strip():
-        return {
-            "is_recipe": False,
-            "error_message": "No input text provided for extraction.",
-            "title": None,
-            "category": None,
-            "prep_time": None,
-            "ingredients": [],
-            "steps": [],
-            "tags": []
-        }
-    
-    full_prompt = f"""
-                    {SYSTEM_PROMPT}
+def error_response(message: str) -> dict:
+    return {
+        "is_recipe": False,
+        "error_message": message,
+        "title": None,
+        "category": None,
+        "prep_time": None,
+        "ingredients": [],
+        "steps": [],
+        "tags": [],
+    }
 
-                    Provided text:
-                    \"\"\"
-                    {recipe_text}
-                    \"\"\"
-                """
-    
-    response = client.models.generate_content(
+def build_recipe_prompt(recipe_text: str) -> str:
+    return f"""
+        {SYSTEM_PROMPT}
+
+        Provided text:
+        \"\"\"
+        {recipe_text}
+        \"\"\"
+    """
+
+def call_gemini(prompt: str):
+    return client.models.generate_content(
         model="gemini-2.5-flash",
-        contents=full_prompt
+        contents=prompt,
     )
 
-    content = response.text.strip()
+
+def parse_ai_response(response_text: str | None) -> dict:
+    content = (response_text or "").strip()
+
+    if not content:
+        return error_response("AI returned an empty response. Please try again.")
 
     if content.startswith("```json"):
         content = content.replace("```json", "").replace("```", "").strip()
-
     elif content.startswith("```"):
         content = content.replace("```", "").strip()
 
-    return json.loads(content)
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        return error_response("AI response could not be parsed. Please try again.")
+
+def extract_recipe_with_ai(recipe_text: str) -> dict:
+    """
+    Sends recipe-related text to Gemini and returns structured recipe data.
+    """
+    if not recipe_text or not recipe_text.strip():
+        return error_response("No input text provided for extraction.")
+
+    prompt = build_recipe_prompt(recipe_text)
+
+    try:
+        response = call_gemini(prompt)
+    except Exception:
+        return error_response(
+            "AI service is currently unavailable. Please try again later."
+        )
+
+    return parse_ai_response(response.text)

@@ -1,14 +1,26 @@
 function RecipeCard({ recipe, onDelete }) {
-  return (
-    <article className="recipe-card">
-      <div className="recipe-card-header">
-        <div>
-          <p className="recipe-category">{recipe.category}</p>
-          <h3>{recipe.title}</h3>
-        </div>
+  const isHebrew = (text = "") => /[\u0590-\u05FF]/.test(text);
 
-        <span className="prep-time">{recipe.prep_time}</span>
+  const recipeText = [
+    recipe.title,
+    ...(recipe.ingredients || []),
+    ...(recipe.steps || []),
+  ].join(" ");
+
+  const direction = isHebrew(recipeText) ? "rtl" : "ltr";
+  const prepTime =
+    recipe.prep_time && recipe.prep_time !== "Not specified"
+      ? recipe.prep_time
+      : null;
+
+  return (
+    <article className={`recipe-card category-${recipe.category?.toLowerCase()}`} dir={direction}>
+      <div className="recipe-card-top">
+        <span className="recipe-category">{recipe.category}</span>
+        {prepTime && <span className="prep-time">⏱ {prepTime}</span>}
       </div>
+
+      <h3>{recipe.title}</h3>
 
       <div className="recipe-tags">
         {recipe.tags.map((tag, index) => (
@@ -18,28 +30,36 @@ function RecipeCard({ recipe, onDelete }) {
         ))}
       </div>
 
-      <div className="recipe-section">
+      <section className="recipe-section">
         <h4>Ingredients</h4>
-        <ul>
+        <ul className="ingredients-list">
           {recipe.ingredients.map((ingredient, index) => (
-            <li key={index}>{ingredient}</li>
+            <li key={index}>
+              <label className="ingredient-item">
+                <input type="checkbox" />
+                <span>{ingredient}</span>
+              </label>
+            </li>
           ))}
         </ul>
-      </div>
+      </section>
 
-      <div className="recipe-section">
+      <section className="recipe-section">
         <h4>Preparation</h4>
-        <ol>
+        <ol className="steps-list">
           {recipe.steps.map((step, index) => (
-            <li key={index}>{step}</li>
+            <li key={index}>
+              <span className="step-number">{index + 1}</span>
+              <span>{step}</span>
+            </li>
           ))}
         </ol>
-      </div>
+      </section>
 
       <div className="recipe-actions">
         {recipe.source_url && (
           <a href={recipe.source_url} target="_blank" rel="noreferrer">
-            Open source
+            ↗ Original recipe
           </a>
         )}
 

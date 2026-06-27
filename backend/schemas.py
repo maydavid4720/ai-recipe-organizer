@@ -1,9 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, List
 
-
 class RecipeCreateRequest(BaseModel):
-    user_input: str
+    user_input: str = Field(..., min_length=10, max_length=10000)
 
 
 class RecipeResponse(BaseModel):
